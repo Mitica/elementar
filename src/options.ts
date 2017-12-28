@@ -1,12 +1,12 @@
 
 export interface ElementarOptions {
-    readonly omitElements?: string[]
-    readonly invalidElements?: string[]
-    readonly emptyElements?: string[]
+    readonly omitElements?: RegExp
+    readonly invalidElements?: RegExp
+    readonly emptyElements?: RegExp
 }
 
 export const ELEMENTAR_OPTIONS: ElementarOptions = {
-    omitElements: ['div'],
-    invalidElements: ['script', 'style'],
-    emptyElements: ['html', 'head', 'body', 'td', 'th'],
+    omitElements: /^div$/,
+    invalidElements: /^script|style$/,
+    emptyElements: /^html|head|body|td|th$/,
 }

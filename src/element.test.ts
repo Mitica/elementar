@@ -1,5 +1,5 @@
 
-import { Element } from './elements';
+import { Element } from './element';
 import test from 'ava';
 
 test('Element constructor', t => {
