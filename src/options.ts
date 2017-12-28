@@ -1,12 +1,14 @@
 
 export interface ElementarOptions {
-    readonly omitElements?: RegExp
-    readonly invalidElements?: RegExp
-    readonly emptyElements?: RegExp
+    readonly omitNodes?: RegExp
+    readonly invalidNodes?: RegExp
+    readonly emptyNodes?: RegExp
 }
 
 export const ELEMENTAR_OPTIONS: ElementarOptions = {
-    omitElements: /^div$/,
-    invalidElements: /^script|style$/,
-    emptyElements: /^html|head|body|td|th$/,
+    omitNodes: /^div$/,
+    invalidNodes: /^script|style$/,
+    emptyNodes: /^html|head|body|td|th$/,
 }
+
+export const LEEF_NODES = /^img|iframe|meta|link$/;

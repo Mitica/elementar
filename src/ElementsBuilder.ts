@@ -1,17 +1,24 @@
 
-import { IElement, TextElement, Element } from './element';
+import debug from './debug';
+import { IElement, TextElement, Element, ParentElement } from './element';
+import { ELEMENTAR_OPTIONS } from './options';
+import { buildElement } from './element-builders';
 
 export interface ElementsBuilderOptions {
-    readonly omitElements?: RegExp
-    readonly invalidElements?: RegExp
-    readonly emptyElements?: RegExp
+    // readonly omitElements?: RegExp
+    readonly invalidNodes?: RegExp
+    // readonly emptyElements?: RegExp
+}
+
+const OPTIONS: ElementsBuilderOptions = {
+    invalidNodes: ELEMENTAR_OPTIONS.invalidNodes
 }
 
 export class ElementsBuilder {
     private options: ElementsBuilderOptions
 
     constructor(options?: ElementsBuilderOptions) {
-        this.options = options || {};
+        this.options = { ...OPTIONS, ...options }
     }
 
     build(nodes: CheerioElement[]): IElement[] {
@@ -20,15 +27,19 @@ export class ElementsBuilder {
 
     private buildElements(nodes: CheerioElement[], elements: IElement[]): IElement[] {
         nodes.forEach(node => {
-            // console.log('element', element);
-            if (node.type === 'text') {
-                this.addElement(elements, new TextElement(node.data));
+            if (!this.isValidNode(node)) {
+                debug(`invalid node: ${node.name}`);
                 return;
             }
-
-            const rootElement = new Element(node.name);
-            this.buildElements(node.children, rootElement.children);
-            this.addElement(elements, rootElement);
+            const element = buildElement(node);
+            if (!element) {
+                debug(`not created element: ${node.name}`);
+                return;
+            }
+            if (element.isParent()) {
+                this.buildElements(node.children, element.asParent().children);
+            }
+            this.addElement(elements, element);
         });
 
         return elements;
@@ -36,12 +47,13 @@ export class ElementsBuilder {
 
     private addElement(elements: IElement[], element: IElement): boolean {
         if (!this.isValidElement(element)) {
+            debug(`invalid element: ${element.name}`);
             return false;
         }
-        if (element instanceof TextElement) {
+        if (element.isText()) {
             const last = elements.length && elements[elements.length - 1] || null;
-            if (last && last instanceof TextElement) {
-                last.content += element.content;
+            if (last && last.isText()) {
+                last.asText().add(element.text());
                 return
             }
         }
@@ -54,5 +66,16 @@ export class ElementsBuilder {
     private isValidElement(element: IElement) {
         // return true;
         return element.hasContent();
+    }
+
+    private isValidNode(node: CheerioElement) {
+        if (node.type === 'text') {
+            return true;
+        }
+        if (node.type === 'tag' && !this.options.invalidNodes.test(node.name)) {
+            return true;
+        }
+
+        return false;
     }
 }

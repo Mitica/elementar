@@ -1,22 +1,27 @@
 
 import { XmlEncode } from './xml';
 
-const CONTENT_ELEMENT_NAME_REG = /^text|img|meta$/;
+const CONTENT_ELEMENT_NAME_REG = /^iframe|img|meta|link$/;
 
 export type ElementProps = { [index: string]: string }
 
 export interface IElement {
     readonly name: string
     readonly props: ElementProps
-    toXML(): string
+    xml(): string
+    text(): string
+    html(): string
     prop(name: string, value?: string): string
     hasContent(): boolean
+    isParent(): boolean
+    isText(): boolean
+    asText(): TextElement
+    asParent(): ParentElement
 }
 
 export class Element implements IElement {
     readonly name: string
     readonly props: ElementProps
-    readonly children: IElement[]
 
     constructor(name: string, props?: ElementProps) {
         if (typeof name !== 'string' || name.trim().length < 1) {
@@ -24,7 +29,20 @@ export class Element implements IElement {
         }
         this.name = name.trim().toLowerCase();
         this.props = props || {};
-        this.children = [];
+    }
+
+    isParent() { return false; }
+    isText() { return false; }
+
+    asText(): TextElement {
+        return null;
+    }
+    asParent(): ParentElement {
+        return null;
+    }
+
+    text(): string {
+        return '';
     }
 
     // addChild(child: IElement) {
@@ -32,8 +50,7 @@ export class Element implements IElement {
     // }
 
     hasContent(): boolean {
-        return CONTENT_ELEMENT_NAME_REG.test(this.name)
-            || !!this.children.find(item => item.hasContent());
+        return CONTENT_ELEMENT_NAME_REG.test(this.name);
     }
 
     prop(name: string, value?: string): string {
@@ -49,8 +66,8 @@ export class Element implements IElement {
         return this.props[name];
     }
 
-    toXML(): string {
-        const content = this.children.map(item => item.toXML()).join('');
+    xml(): string {
+        const content = this.contentXML();
         let props = '';
         if (this.props && Object.keys(this.props).length) {
             props = ' ' + Object.keys(this.props).map(prop => `${prop}="${XmlEncode(this.props[prop])}"`).join(' ');
@@ -60,18 +77,69 @@ export class Element implements IElement {
         }
         return `<${this.name}${props} />`;
     }
+
+    protected contentXML(): string {
+        return '';
+    }
+
+    html(): string {
+        return this.xml();
+    }
+}
+
+export class ParentElement extends Element {
+    readonly children: IElement[] = []
+
+    constructor(name: string, props?: ElementProps) {
+        super(name, props);
+    }
+
+    hasContent(): boolean {
+        return !!this.children.find(item => item.hasContent());
+    }
+
+    contentXML(): string {
+        return this.children.map(item => item.xml()).join('');
+    }
+
+    isParent() { return true; }
+
+    text(): string {
+        return this.children.map(item => item.text()).join('');
+    }
+    asParent(): ParentElement {
+        return this;
+    }
 }
 
 export class TextElement extends Element {
+
     constructor(public content?: string, props?: ElementProps) {
         super('text', props);
     }
 
-    toXML(): string {
-        return `<text>${XmlEncode(this.content)}</text>`;
+    xml(): string {
+        return `<text>${XmlEncode(this.text())}</text>`;
     }
 
     hasContent(): boolean {
         return true;
+    }
+
+    isText() { return true; }
+
+    text(): string {
+        return this.content;
+    }
+
+    add(text: string) {
+        return this.content += text;
+    }
+    asText(): TextElement {
+        return this;
+    }
+
+    html(): string {
+        return this.text();
     }
 }
