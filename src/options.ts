@@ -17,6 +17,11 @@ export interface ElementarOptions {
      * Elements to ignore: b, strong, u, i, ins
      */
     readonly ignoreElements?: RegExp
+
+    /**
+     * Custom element builders
+     */
+    readonly customElements?: CustomElement[]
 }
 
 // export const CONTENT_NODES = /^img|iframe|meta|link$/;
@@ -26,6 +31,18 @@ export const ELEMENTAR_OPTIONS: ElementarOptions = {
     emptyElements: /^(html|head|body|td|th)$/,
     contentElements: /^(img|iframe|meta|link)$/,
     ignoreElements: /^(ins|strong|b|abbr|acronym|bdo|big|cite|em|i|kbd|label|samp|small|span|sub|sup|tt)$/,
+}
+
+export interface ElementBuildData {
+    name: string
+    props?: { [index: string]: string }
+    isContent: boolean
+    isParent: boolean
+}
+
+export interface CustomElement {
+    name: string
+    build(node: CheerioElement, options?: ElementarOptions): ElementBuildData
 }
 
 export function mergeDefaultOptions(options: ElementarOptions) {

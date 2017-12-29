@@ -17,13 +17,14 @@ export class ElementsBuilder {
 
     private buildElements(nodes: CheerioElement[], elements: IElement[]): IElement[] {
         nodes.forEach(node => {
-            if (!this.isValidNode(node)) {
-                debug(`invalid node: ${node.name}`);
-                return;
-            }
             const element = buildElement(node, this.options);
             if (!element) {
                 debug(`not created element: ${node.name}`);
+                return;
+            }
+            // some nodes can be invalid and be a special element: an youtube iframe
+            if (!element.isContent && !this.isValidNode(node)) {
+                debug(`invalid node: ${node.name}`);
                 return;
             }
             if (element.isParent()) {

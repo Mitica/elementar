@@ -18,3 +18,17 @@ export function cheerioFromHTML(html: string) {
 
     return el;
 }
+
+export function pick(o: { [index: string]: any }, ...props: string[]) {
+    return Object.assign({}, ...props.map(prop => ({ [prop]: o[prop] })));
+}
+
+export function cleanObject(o: { [index: string]: any }) {
+    for (let prop in o) {
+        if (~[undefined, null, ''].indexOf(o[prop])) {
+            delete o[prop];
+        }
+    }
+
+    return o;
+}

@@ -1,6 +1,6 @@
 
-import { IElement, Element, ParentElement } from '../Element';
-import { ElementarOptions } from '../options';
+import { IElement, Element, ParentElement, ElementProps } from '../Element';
+import { ElementarOptions, CustomElement, ElementBuildData } from '../options';
 
 const PROPS: { [index: string]: RegExp } = {
     html: /^lang|dir$/,
@@ -15,17 +15,27 @@ const PROPS: { [index: string]: RegExp } = {
     time: /^datetime$/,
 };
 
-export default function build(node: CheerioElement, options: ElementarOptions): IElement {
-    if (node.type === 'tag') {
-        const isContent = options.contentElements.test(node.name);
-        const element = new ParentElement(node.name, {}, isContent);
+const builder: CustomElement = {
+    name: 'element',
 
-        Object.keys(node.attribs).forEach(key => {
-            if (PROPS[element.name].test(key)) {
-                element.prop(key, node.attribs[key]);
+    build(node: CheerioElement, options?: ElementarOptions): ElementBuildData {
+        if (node.type === 'tag') {
+            const isContent = options.contentElements.test(node.name);
+            const props: ElementProps = {}
+
+            Object.keys(node.attribs).forEach(prop => {
+                if (PROPS[node.name].test(prop) && node.attribs[prop]) {
+                    props[prop] = node.attribs[prop];
+                }
+            });
+
+            return {
+                name: node.name,
+                isContent,
+                isParent: true
             }
-        });
-
-        return element;
+        }
     }
 }
+
+export default builder;

@@ -4,7 +4,10 @@ import debug from './debug';
 
 export type ElementProps = { [index: string]: string }
 
+// export type ElementType = 'text' | 'tag';
+
 export interface IElement {
+    // readonly type
     readonly name: string
     readonly props: ElementProps
     readonly isContent: boolean
@@ -18,8 +21,6 @@ export interface IElement {
     asText(): TextElement
     asParent(): ParentElement
 }
-
-export type ContentFormat = 'xml' | 'html';
 
 export class Element implements IElement {
     readonly name: string
