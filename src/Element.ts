@@ -4,58 +4,96 @@ import debug from './debug';
 
 export type ElementProps = { [index: string]: string }
 
-// export type ElementType = 'text' | 'tag';
+export type ElementType = 'text' | 'tag';
 
 export interface IElement {
-    // readonly type
+    readonly type: ElementType
     readonly name: string
     readonly props: ElementProps
     readonly isContent: boolean
+    readonly isLeaf: boolean
+    readonly data?: string
+    readonly children: IElement[]
     xml(): string
     text(): string
     html(): string
     prop(name: string, value?: string): string
     hasContent(): boolean
-    isParent(): boolean
     isText(): boolean
-    asText(): TextElement
-    asParent(): ParentElement
+    isTag(): boolean
+    addData(data: string): string
+}
+
+export interface ElementContructorData {
+    props?: ElementProps
+    isContent?: boolean
+    isLeaf?: boolean
+    data?: string
+    children?: IElement[]
 }
 
 export class Element implements IElement {
+    readonly type: ElementType
     readonly name: string
     readonly props: ElementProps
     readonly isContent: boolean
+    readonly isLeaf: boolean
+    data?: string
+    readonly children: IElement[]
 
-    constructor(name: string, props?: ElementProps, isContent?: boolean) {
+    constructor(type: ElementType, name?: string, data?: ElementContructorData) {
+        if (['text', 'tag'].indexOf(type) < 0) {
+            throw new Error(`Element type is invalid!`);
+        }
+        this.type = type;
+        if (type === 'text') {
+            name = 'text';
+        }
+
         if (typeof name !== 'string' || name.trim().length < 1) {
-            throw new Error(`Element name is required!`);
+            throw new Error(`Element name is invalid!`);
         }
         this.name = name.trim().toLowerCase();
-        this.props = props || {};
-        this.isContent = typeof isContent === 'boolean' ? isContent : false;
+
+        data = data || {};
+        if (this.type === 'text') {
+            this.isContent = true;
+            this.isLeaf = true;
+        } else {
+            this.props = data.props || {};
+            this.isContent = typeof data.isContent === 'boolean' ? data.isContent : false;
+            this.isLeaf = typeof data.isLeaf === 'boolean' ? data.isLeaf : false;
+        }
+        if (data.data) {
+            this.data = data.data;
+        }
+        if (this.type === 'tag' && !this.isLeaf) {
+            this.children = Array.isArray(data.children) ? data.children : [];
+        }
     }
 
-    isParent() { return false; }
-    isText() { return false; }
-
-    asText(): TextElement {
-        return null;
+    isText(): boolean {
+        return this.type === 'text';
     }
-    asParent(): ParentElement {
-        return null;
+    isTag(): boolean {
+        return this.type === 'tag';
     }
 
     text(): string {
+        if (this.isText()) {
+            return this.data || '';
+        }
+        if (this.children) {
+            return this.children.map(item => item.text()).join('');
+        }
         return '';
     }
 
-    // addChild(child: IElement) {
-    //     return this.children.push(child);
-    // }
-
     hasContent(): boolean {
-        return this.isContent;
+        if (this.isText()) {
+            return this.data && this.data.trim().length > 0;
+        }
+        return this.isContent || this.children && !!this.children.find(item => item.hasContent());
     }
 
     prop(name: string, value?: string): string {
@@ -72,7 +110,11 @@ export class Element implements IElement {
     }
 
     xml(): string {
-        const content = this.formatXmlContent();
+        if (this.type === 'text') {
+            return `<text>${XmlEncode(this.text())}</text>`;
+        }
+
+        const content = this.children && this.children.map(item => item.xml()).join('');
         let props = '';
         if (this.props && Object.keys(this.props).length) {
             props = ' ' + Object.keys(this.props).map(prop => `${prop}="${XmlEncode(this.props[prop])}"`).join(' ');
@@ -83,7 +125,11 @@ export class Element implements IElement {
         return `<${this.name}${props} />`;
     }
     html(): string {
-        const content = this.formatHtmlContent();
+        if (this.isText()) {
+            return XmlEncode(this.text());
+        }
+
+        const content = this.children && this.children.map(item => item.html()).join('');
         let props = '';
         if (this.props && Object.keys(this.props).length) {
             props = ' ' + Object.keys(this.props).map(prop => `${prop}="${XmlEncode(this.props[prop])}"`).join(' ');
@@ -94,69 +140,19 @@ export class Element implements IElement {
         return `<${this.name}${props} />`;
     }
 
-    protected formatXmlContent(): string {
-        return '';
-    }
-    protected formatHtmlContent(): string {
-        return '';
+    addData(data: string): string {
+        return this.data += data;
     }
 }
 
-export class ParentElement extends Element {
-    readonly children: IElement[] = []
-
-    constructor(name: string, props?: ElementProps, isContent?: boolean) {
-        super(name, props, isContent);
-    }
-
-    hasContent(): boolean {
-        return this.isContent || !!this.children.find(item => item.hasContent());
-    }
-
-    protected formatXmlContent(): string {
-        return this.children.map(item => item.xml()).join('');
-    }
-    protected formatHtmlContent(): string {
-        return this.children.map(item => item.html()).join('');
-    }
-
-    isParent() { return true; }
-
-    text(): string {
-        return this.children.map(item => item.text()).join('');
-    }
-    asParent(): ParentElement {
-        return this;
+export class TagElement extends Element {
+    constructor(name: string, data?: ElementContructorData) {
+        super('tag', name, data);
     }
 }
 
 export class TextElement extends Element {
-    constructor(public content?: string, props?: ElementProps) {
-        super('text', props, true);
-    }
-
-    hasContent() {
-        return this.content && this.content.trim().length > 0;
-    }
-
-    xml(): string {
-        return `<text>${XmlEncode(this.text())}</text>`;
-    }
-
-    isText() { return true; }
-
-    text(): string {
-        return this.content;
-    }
-
-    add(text: string) {
-        return this.content += text;
-    }
-    asText(): TextElement {
-        return this;
-    }
-
-    html(): string {
-        return this.text();
+    constructor(data?: ElementContructorData) {
+        super('text', 'text', data);
     }
 }

@@ -27,7 +27,7 @@ const builder: CustomElement = {
                         name: 'youtube-video',
                         props,
                         isContent: true,
-                        isParent: false,
+                        isLeaf: false,
                     }
                 }
             }

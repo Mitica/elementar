@@ -27,9 +27,9 @@ export interface ElementarOptions {
 // export const CONTENT_NODES = /^img|iframe|meta|link$/;
 
 export const ELEMENTAR_OPTIONS: ElementarOptions = {
-    invalidElements: /^(frameset|frame|script|style|form|button|input|select|map|textarea)$/,
+    invalidElements: /^(frameset|frame|iframe|script|style|form|button|input|select|map|textarea)$/,
     emptyElements: /^(html|head|body|td|th)$/,
-    contentElements: /^(img|iframe|meta|link)$/,
+    contentElements: /^(img|meta|link)$/,
     ignoreElements: /^(ins|strong|b|abbr|acronym|bdo|big|cite|em|i|kbd|label|samp|small|span|sub|sup|tt)$/,
 }
 
@@ -37,7 +37,7 @@ export interface ElementBuildData {
     name: string
     props?: { [index: string]: string }
     isContent: boolean
-    isParent: boolean
+    isLeaf: boolean
 }
 
 export interface CustomElement {

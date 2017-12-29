@@ -1,5 +1,5 @@
 
-import { IElement, Element, ParentElement, ElementProps } from '../Element';
+import { IElement, Element, ElementProps } from '../Element';
 import { ElementarOptions, CustomElement, ElementBuildData } from '../options';
 
 const PROPS: { [index: string]: RegExp } = {
@@ -32,7 +32,7 @@ const builder: CustomElement = {
             return {
                 name: node.name,
                 isContent,
-                isParent: true
+                isLeaf: false
             }
         }
     }

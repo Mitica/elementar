@@ -38,7 +38,7 @@ const builder: CustomElement = {
             return {
                 name: 'div-tab',
                 isContent: false,
-                isParent: true,
+                isLeaf: true,
             }
         }
     }

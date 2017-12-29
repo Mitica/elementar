@@ -1,6 +1,6 @@
 
 import debug from './debug';
-import { IElement, TextElement, Element, ParentElement } from './Element';
+import { IElement, Element } from './Element';
 import { ELEMENTAR_OPTIONS, ElementarOptions } from './options';
 import { buildElement } from './element-builders';
 
@@ -27,8 +27,8 @@ export class ElementsBuilder {
                 debug(`invalid node: ${node.name}`);
                 return;
             }
-            if (element.isParent()) {
-                this.buildElements(node.children, element.asParent().children);
+            if (!element.isLeaf) {
+                this.buildElements(node.children, element.children);
             }
             this.addElement(elements, element);
         });
@@ -44,7 +44,7 @@ export class ElementsBuilder {
         if (element.isText()) {
             const last = elements.length && elements[elements.length - 1] || null;
             if (last && last.isText()) {
-                last.asText().add(element.text());
+                last.addData(element.text());
             } else {
                 elements.push(element);
             }
@@ -54,9 +54,9 @@ export class ElementsBuilder {
 
         // ignore element
         if (!element.isContent && this.options.ignoreElements.test(element.name)) {
-            if (element.isParent()) {
+            if (!element.isLeaf) {
                 debug(`Add childs of a Ignored elemenet: ${element.name}`);
-                (<ParentElement>element).children.forEach(child => this.addElement(elements, child));
+                element.children.forEach(child => this.addElement(elements, child));
             }
             return false;
         }

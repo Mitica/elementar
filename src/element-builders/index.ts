@@ -1,5 +1,5 @@
 
-import { IElement, Element, TextElement, ParentElement } from '../Element';
+import { IElement, TextElement, TagElement } from '../Element';
 import elementBuild from './element';
 import youtubeBuild from './youtube';
 import { ElementarOptions, CustomElement, ElementBuildData, ELEMENTAR_OPTIONS } from '../options';
@@ -7,7 +7,7 @@ import { ElementarOptions, CustomElement, ElementBuildData, ELEMENTAR_OPTIONS } 
 export function buildElement(node: CheerioElement, options: ElementarOptions): IElement {
     options = options || ELEMENTAR_OPTIONS;
     if (node.type === 'text') {
-        return new TextElement(node.data);
+        return new TextElement({ data: node.data });
     }
 
     const localBuilders: CustomElement[] = [youtubeBuild, elementBuild];
@@ -23,14 +23,7 @@ export function buildElement(node: CheerioElement, options: ElementarOptions): I
             throw new Error(`Error on building element(${builder.name}): ${e.message}`);
         }
         if (data) {
-            return createElement(data);
+            return new TagElement(data.name, data);
         }
     }
-}
-
-function createElement(data: ElementBuildData): IElement {
-    if (data.isParent === false) {
-        return new Element(data.name, data.props, data.isContent);
-    }
-    return new ParentElement(data.name, data.props, data.isContent);
 }
