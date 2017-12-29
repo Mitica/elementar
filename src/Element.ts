@@ -1,13 +1,12 @@
 
 import { XmlEncode } from './xml';
 
-const CONTENT_ELEMENT_NAME_REG = /^iframe|img|meta|link$/;
-
 export type ElementProps = { [index: string]: string }
 
 export interface IElement {
     readonly name: string
     readonly props: ElementProps
+    readonly isContent: boolean
     xml(): string
     text(): string
     html(): string
@@ -22,13 +21,15 @@ export interface IElement {
 export class Element implements IElement {
     readonly name: string
     readonly props: ElementProps
+    readonly isContent: boolean
 
-    constructor(name: string, props?: ElementProps) {
+    constructor(name: string, props?: ElementProps, isContent?: boolean) {
         if (typeof name !== 'string' || name.trim().length < 1) {
             throw new Error(`Element name is required!`);
         }
         this.name = name.trim().toLowerCase();
         this.props = props || {};
+        this.isContent = typeof isContent === 'boolean' ? isContent : false;
     }
 
     isParent() { return false; }
@@ -50,7 +51,7 @@ export class Element implements IElement {
     // }
 
     hasContent(): boolean {
-        return CONTENT_ELEMENT_NAME_REG.test(this.name);
+        return this.isContent;
     }
 
     prop(name: string, value?: string): string {
@@ -90,12 +91,12 @@ export class Element implements IElement {
 export class ParentElement extends Element {
     readonly children: IElement[] = []
 
-    constructor(name: string, props?: ElementProps) {
-        super(name, props);
+    constructor(name: string, props?: ElementProps, isContent?: boolean) {
+        super(name, props, isContent);
     }
 
     hasContent(): boolean {
-        return !!this.children.find(item => item.hasContent());
+        return this.isContent || !!this.children.find(item => item.hasContent());
     }
 
     contentXML(): string {
@@ -115,15 +116,11 @@ export class ParentElement extends Element {
 export class TextElement extends Element {
 
     constructor(public content?: string, props?: ElementProps) {
-        super('text', props);
+        super('text', props, true);
     }
 
     xml(): string {
         return `<text>${XmlEncode(this.text())}</text>`;
-    }
-
-    hasContent(): boolean {
-        return true;
     }
 
     isText() { return true; }

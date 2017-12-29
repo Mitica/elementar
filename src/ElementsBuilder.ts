@@ -1,24 +1,14 @@
 
 import debug from './debug';
 import { IElement, TextElement, Element, ParentElement } from './element';
-import { ELEMENTAR_OPTIONS } from './options';
+import { ELEMENTAR_OPTIONS, ElementarOptions } from './options';
 import { buildElement } from './element-builders';
 
-export interface ElementsBuilderOptions {
-    // readonly omitElements?: RegExp
-    readonly invalidNodes?: RegExp
-    // readonly emptyElements?: RegExp
-}
-
-const OPTIONS: ElementsBuilderOptions = {
-    invalidNodes: ELEMENTAR_OPTIONS.invalidNodes
-}
-
 export class ElementsBuilder {
-    private options: ElementsBuilderOptions
+    private options: ElementarOptions
 
-    constructor(options?: ElementsBuilderOptions) {
-        this.options = { ...OPTIONS, ...options }
+    constructor(options?: ElementarOptions) {
+        this.options = { ...ELEMENTAR_OPTIONS, ...options }
     }
 
     build(nodes: CheerioElement[]): IElement[] {
@@ -31,7 +21,7 @@ export class ElementsBuilder {
                 debug(`invalid node: ${node.name}`);
                 return;
             }
-            const element = buildElement(node);
+            const element = buildElement(node, this.options);
             if (!element) {
                 debug(`not created element: ${node.name}`);
                 return;
@@ -64,15 +54,14 @@ export class ElementsBuilder {
     }
 
     private isValidElement(element: IElement) {
-        // return true;
-        return element.hasContent();
+        return element.hasContent() || this.options.emptyElements.test(element.name);
     }
 
     private isValidNode(node: CheerioElement) {
         if (node.type === 'text') {
             return true;
         }
-        if (node.type === 'tag' && !this.options.invalidNodes.test(node.name)) {
+        if (node.type === 'tag' && !this.options.invalidElements.test(node.name)) {
             return true;
         }
 
