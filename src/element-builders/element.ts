@@ -12,6 +12,7 @@ const PROPS: { [index: string]: RegExp } = {
     bdo: /^dir$/,
     q: /^cite$/,
     blockquote: /^cite$/,
+    time: /^datetime$/,
 };
 
 export default function build(node: CheerioElement, options: ElementarOptions): IElement {

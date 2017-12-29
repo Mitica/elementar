@@ -1,5 +1,6 @@
 
 import { XmlEncode } from './xml';
+import debug from './debug';
 
 export type ElementProps = { [index: string]: string }
 
@@ -17,6 +18,8 @@ export interface IElement {
     asText(): TextElement
     asParent(): ParentElement
 }
+
+export type ContentFormat = 'xml' | 'html';
 
 export class Element implements IElement {
     readonly name: string
@@ -68,23 +71,33 @@ export class Element implements IElement {
     }
 
     xml(): string {
-        const content = this.contentXML();
+        const content = this.formatXmlContent();
         let props = '';
         if (this.props && Object.keys(this.props).length) {
             props = ' ' + Object.keys(this.props).map(prop => `${prop}="${XmlEncode(this.props[prop])}"`).join(' ');
         }
         if (content) {
-            return `<${this.name}${props}>${XmlEncode(content)}</${this.name}>`;
+            return `<${this.name}${props}>${content}</${this.name}>`;
+        }
+        return `<${this.name}${props} />`;
+    }
+    html(): string {
+        const content = this.formatHtmlContent();
+        let props = '';
+        if (this.props && Object.keys(this.props).length) {
+            props = ' ' + Object.keys(this.props).map(prop => `${prop}="${XmlEncode(this.props[prop])}"`).join(' ');
+        }
+        if (content) {
+            return `<${this.name}${props}>${content}</${this.name}>`;
         }
         return `<${this.name}${props} />`;
     }
 
-    protected contentXML(): string {
+    protected formatXmlContent(): string {
         return '';
     }
-
-    html(): string {
-        return this.xml();
+    protected formatHtmlContent(): string {
+        return '';
     }
 }
 
@@ -99,8 +112,11 @@ export class ParentElement extends Element {
         return this.isContent || !!this.children.find(item => item.hasContent());
     }
 
-    contentXML(): string {
+    protected formatXmlContent(): string {
         return this.children.map(item => item.xml()).join('');
+    }
+    protected formatHtmlContent(): string {
+        return this.children.map(item => item.html()).join('');
     }
 
     isParent() { return true; }
@@ -114,9 +130,12 @@ export class ParentElement extends Element {
 }
 
 export class TextElement extends Element {
-
     constructor(public content?: string, props?: ElementProps) {
         super('text', props, true);
+    }
+
+    hasContent() {
+        return this.content && this.content.trim().length > 0;
     }
 
     xml(): string {

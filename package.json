@@ -14,10 +14,11 @@
         "postversion": "git push --follow-tags",
         "prepublish": "npm run tsc && npm run clean-test-code",
         "clean": "rm -fr ./lib && rm -fr ./types",
-        "clean-test-code": "rm -fr ./lib/**/*.test.js && rm -fr ./lib/*.test.js && rm -fr ./types/**/*.test.d.ts && rm -fr ./types/*.test.d.ts"
+        "clean-test-code": "rm -fr ./lib/**/*.test.js && rm -fr ./lib/*.test.js && rm -fr ./types/**/*.test.d.ts && rm -fr ./types/*.test.d.ts",
+        "build": "npm run tsc && npm run test"
     },
     "engines": {
-        "node": ">=6.0.0"
+        "node": ">=4.0.0"
     },
     "repository": {
         "type": "git",

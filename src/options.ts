@@ -22,11 +22,10 @@ export interface ElementarOptions {
 // export const CONTENT_NODES = /^img|iframe|meta|link$/;
 
 export const ELEMENTAR_OPTIONS: ElementarOptions = {
-    // omitElements: /^div$/,
-    invalidElements: /^frameset|frame|script|style|form|button|input|select|map|textarea$/,
-    emptyElements: /^html|head|body|td|th$/,
-    contentElements: /^img|iframe|meta|link$/,
-    ignoreElements: /^ins|strong|b|abbr|acronym|bdo|big|$/,
+    invalidElements: /^(frameset|frame|script|style|form|button|input|select|map|textarea)$/,
+    emptyElements: /^(html|head|body|td|th)$/,
+    contentElements: /^(img|iframe|meta|link)$/,
+    ignoreElements: /^(ins|strong|b|abbr|acronym|bdo|big|cite|em|i|kbd|label|samp|small|span|sub|sup|tt)$/,
 }
 
 export function mergeDefaultOptions(options: ElementarOptions) {

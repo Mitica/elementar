@@ -44,8 +44,20 @@ export class ElementsBuilder {
             const last = elements.length && elements[elements.length - 1] || null;
             if (last && last.isText()) {
                 last.asText().add(element.text());
-                return
+            } else {
+                elements.push(element);
             }
+
+            return true;
+        }
+
+        // ignore element
+        if (!element.isContent && this.options.ignoreElements.test(element.name)) {
+            if (element.isParent()) {
+                debug(`Add childs of a Ignored elemenet: ${element.name}`);
+                (<ParentElement>element).children.forEach(child => this.addElement(elements, child));
+            }
+            return false;
         }
 
         elements.push(element);
