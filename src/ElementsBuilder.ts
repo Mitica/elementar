@@ -1,6 +1,6 @@
 
 import debug from './debug';
-import { IElement, TextElement, Element, ParentElement } from './element';
+import { IElement, TextElement, Element, ParentElement } from './Element';
 import { ELEMENTAR_OPTIONS, ElementarOptions } from './options';
 import { buildElement } from './element-builders';
 

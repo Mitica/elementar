@@ -1,5 +1,5 @@
 
-import { IElement } from './element';
+import { IElement } from './Element';
 import { ElementarOptions, ELEMENTAR_OPTIONS } from './options';
 import { cheerioFromHTML } from './utils';
 import { ElementsBuilder } from './ElementsBuilder';
