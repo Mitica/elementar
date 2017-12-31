@@ -13,3 +13,23 @@ console.log(elementar.xml()) // <p><text>Here is the answer!</text></p>
 console.log(elementar.text()) // Here is the answer!
 
 ```
+
+## API
+
+### fromHtml(html: string, options?: ElementarOptions): Elementar
+
+See [options](blob/master/src/options.ts).
+
+### Elementar
+
+### .html(): string
+
+Returns the processed html.
+
+### .xml(): string
+
+Returns the processed html as xml.
+
+### .text(): string
+
+Returns the text from html.
