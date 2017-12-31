@@ -4,7 +4,7 @@ import test from 'ava';
 import { cheerioFromHTML } from './utils';
 import { TagElement } from './Element';
 
-test('buildElements', t => {
+test('simple', t => {
     const $ = cheerioFromHTML('<div> some <span></span>text <p>in P text</p></div>');
 
     const builder = new ElementsBuilder();
@@ -16,7 +16,7 @@ test('buildElements', t => {
     t.is(elements[0].text(), ' some text in P text', 'concat text');
 });
 
-test('use onElement callback', t => {
+test('onElement callback', t => {
     const $ = cheerioFromHTML('<div><p>Here</p> is the <span>answer</span><i>!</i></div>');
 
     const builder = new ElementsBuilder({

@@ -64,7 +64,7 @@ export class ElementsBuilder {
     }
 
     private addElement(elements: IElement[], element: IElement): boolean {
-        if (!this.isValidElement(element)) {
+        if (this.isInvalidElement(element)) {
             debug(`invalid element: ${element.name}`);
             return false;
         }
@@ -79,9 +79,24 @@ export class ElementsBuilder {
             return true;
         }
 
+        let ignoreElement = false;
+
+        if (!element.isContent) {
+            if (!element.children || element.children.length === 0) {
+                // no content AND no children
+                debug(`Leaf no content element: ${element.name}`);
+                return false;
+            }
+            // no isContent children
+            ignoreElement = !element.children.find(item => item.isContent);
+
+            // is abstract
+            ignoreElement = ignoreElement || this.options.abstractElements.indexOf(element.name) > -1;
+        }
+
         // ignore element
-        if (!element.isContent && this.options.abstractElements.indexOf(element.name) > -1) {
-            if (!element.isLeaf) {
+        if (ignoreElement) {
+            if (!element.isLeaf && element.children) {
                 debug(`Add childs of a Ignored elemenet: ${element.name}`);
                 element.children.forEach(child => this.addElement(elements, child));
             }
@@ -93,8 +108,9 @@ export class ElementsBuilder {
         return true;
     }
 
-    private isValidElement(element: IElement) {
-        return element.hasContent() || this.options.emptyElements.indexOf(element.name) > -1;
+    private isInvalidElement(element: IElement) {
+        return !element.hasContent()
+            && this.options.emptyElements.indexOf(element.name) < 0;
     }
 
     private isValidNode(node: CheerioElement) {

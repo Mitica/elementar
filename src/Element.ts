@@ -92,7 +92,7 @@ export class Element implements IElement {
 
     hasContent(): boolean {
         if (this.isText()) {
-            return this.data && this.data.trim().length > 0;
+            return !!this.data;
         }
         return this.isContent || this.children && !!this.children.find(item => item.hasContent());
     }
