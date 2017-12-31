@@ -18,7 +18,7 @@ console.log(elementar.text()) // Here is the answer!
 
 ### fromHtml(html: string, options?: ElementarOptions): Elementar
 
-See [options](blob/master/src/options.ts).
+See [options](src/options.ts).
 
 ### Elementar
 
