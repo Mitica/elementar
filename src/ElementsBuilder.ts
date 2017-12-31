@@ -24,8 +24,8 @@ export class ElementsBuilder {
                     debug(`invalid node: ${node.name}`);
                     return;
                 }
-                else if (result === 'ignore') {
-                    debug(`ignore node: ${node.name}`);
+                else if (result === 'abstract') {
+                    debug(`abstract node: ${node.name}`);
                     this.buildElements(node.children, elements);
                     return;
                 }
@@ -80,7 +80,7 @@ export class ElementsBuilder {
         }
 
         // ignore element
-        if (!element.isContent && this.options.ignoreElements.indexOf(element.name) > -1) {
+        if (!element.isContent && this.options.abstractElements.indexOf(element.name) > -1) {
             if (!element.isLeaf) {
                 debug(`Add childs of a Ignored elemenet: ${element.name}`);
                 element.children.forEach(child => this.addElement(elements, child));

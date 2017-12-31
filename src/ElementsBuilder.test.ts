@@ -22,7 +22,7 @@ test('use onElement callback', t => {
     const builder = new ElementsBuilder({
         onElement: function (element: CheerioElement) {
             if (element.tagName === 'p') {
-                return 'ignore';
+                return 'abstract';
             }
             if (element.tagName === 'i') {
                 return 'invalid';

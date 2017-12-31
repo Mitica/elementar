@@ -14,9 +14,9 @@ export interface ElementarOptions {
     readonly contentElements?: string[]
 
     /**
-     * Elements to ignore: b, strong, u, i, ins
+     * Ignore element, but not its children: b, strong, u, i, ins
      */
-    readonly ignoreElements?: string[]
+    readonly abstractElements?: string[]
 
     /**
      * Custom element builders
@@ -29,7 +29,7 @@ export interface ElementarOptions {
     readonly elementProps?: { [index: string]: string[] }
 
     /**
-     * 
+     * Callback on element creating. You can invalidate, ignore or mutate elements.
      */
     readonly onElement?: OnElementFunction
 }
@@ -38,7 +38,7 @@ export const ELEMENTAR_OPTIONS: ElementarOptions = {
     invalidElements: ['frameset', 'frame', 'iframe', 'script', 'style', 'form', 'button', 'input', 'select', 'map', 'textarea'],
     emptyElements: ['html', 'head', 'body', 'td', 'th'],
     contentElements: ['img', 'meta', 'link'],
-    ignoreElements: ['ins', 'strong', 'b', 'abbr', 'acronym', 'bdo', 'big', 'cite', 'em', 'i', 'kbd', 'label', 'samp', 'small', 'span', 'sub', 'sup', 'tt'],
+    abstractElements: ['ins', 'strong', 'b', 'abbr', 'acronym', 'bdo', 'big', 'cite', 'em', 'i', 'kbd', 'label', 'samp', 'small', 'span', 'sub', 'sup', 'tt'],
     elementProps: {
         html: ['lang', 'dir'],
         iframe: ['src', 'height', 'width'],
@@ -57,12 +57,15 @@ export interface OnElementFunction {
     (element: CheerioElement): OnElementReturn
 }
 
-export type OnElementReturn = 'ignore' | 'invalid' | ElementBuildData;
+export type OnElementReturn = 'invalid' | 'abstract' | ElementBuildData;
 
 export interface ElementBuildData {
+    /** Element tag name */
     name: string
     props?: { [index: string]: string }
+    /** Is element a content: text, image, video, custom? */
     isContent: boolean
+    /** Is element a leaf: ignore its children? */
     isLeaf: boolean
 }
 
