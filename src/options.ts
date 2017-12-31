@@ -27,6 +27,11 @@ export interface ElementarOptions {
      * Element properties to keep
      */
     readonly elementProps?: { [index: string]: string[] }
+
+    /**
+     * 
+     */
+    readonly onElement?: OnElementFunction
 }
 
 export const ELEMENTAR_OPTIONS: ElementarOptions = {
@@ -47,6 +52,12 @@ export const ELEMENTAR_OPTIONS: ElementarOptions = {
         time: ['datetime'],
     },
 }
+
+export interface OnElementFunction {
+    (element: CheerioElement): OnElementReturn
+}
+
+export type OnElementReturn = 'ignore' | 'invalid' | ElementBuildData;
 
 export interface ElementBuildData {
     name: string

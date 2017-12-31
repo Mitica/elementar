@@ -1,7 +1,7 @@
 
 import debug from './debug';
-import { IElement, Element } from './Element';
-import { ELEMENTAR_OPTIONS, ElementarOptions } from './options';
+import { IElement, Element, buildElementFromData } from './Element';
+import { ELEMENTAR_OPTIONS, ElementarOptions, OnElementReturn } from './options';
 import { buildElement } from './element-builders';
 
 export class ElementsBuilder {
@@ -17,7 +17,34 @@ export class ElementsBuilder {
 
     private buildElements(nodes: CheerioElement[], elements: IElement[]): IElement[] {
         nodes.forEach(node => {
-            const element = buildElement(node, this.options);
+            let element: IElement
+            if (typeof this.options.onElement === 'function') {
+                const result = this.options.onElement(node);
+                if (result === 'invalid') {
+                    debug(`invalid node: ${node.name}`);
+                    return;
+                }
+                else if (result === 'ignore') {
+                    debug(`ignore node: ${node.name}`);
+                    this.buildElements(node.children, elements);
+                    return;
+                }
+                else if (result && result.name) {
+                    element = buildElementFromData(result);
+                    if (element) {
+                        if (!element.isLeaf) {
+                            this.buildElements(node.children, element.children);
+                        }
+                        elements.push(element);
+                        return;
+                    }
+                }
+            }
+            // not created by onElement callback
+            // if (!element) {
+            element = buildElement(node, this.options);
+            // }
+            // not created locally
             if (!element) {
                 debug(`not created element: ${node.name}`);
                 return;
