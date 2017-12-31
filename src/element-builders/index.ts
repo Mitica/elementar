@@ -1,7 +1,7 @@
 
 import { IElement, TextElement, TagElement, buildElementFromData } from '../Element';
 import elementBuild from './element';
-import youtubeBuild from './youtube';
+// import youtubeBuild from './youtube';
 import { ElementarOptions, CustomElement, ElementBuildData, ELEMENTAR_OPTIONS } from '../options';
 
 export function buildElement(node: CheerioElement, options: ElementarOptions): IElement {
@@ -10,7 +10,7 @@ export function buildElement(node: CheerioElement, options: ElementarOptions): I
         return new TextElement({ data: node.data });
     }
 
-    const localBuilders: CustomElement[] = [youtubeBuild, elementBuild];
+    const localBuilders: CustomElement[] = [elementBuild];
 
     const BUILDERS: CustomElement[] = (options.customElements || []).concat(localBuilders);
 
