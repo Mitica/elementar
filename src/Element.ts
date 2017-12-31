@@ -1,6 +1,7 @@
 
 import { XmlEncode } from './xml';
 import debug from './debug';
+import { ElementBuildData } from './options';
 
 export type ElementProps = { [index: string]: string }
 
@@ -155,4 +156,8 @@ export class TextElement extends Element {
     constructor(data?: ElementContructorData) {
         super('text', 'text', data);
     }
+}
+
+export function buildElementFromData(data: ElementBuildData) {
+    return new TagElement(data.name, data);
 }

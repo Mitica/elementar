@@ -1,5 +1,5 @@
 
-import { IElement, TextElement, TagElement } from '../Element';
+import { IElement, TextElement, TagElement, buildElementFromData } from '../Element';
 import elementBuild from './element';
 import youtubeBuild from './youtube';
 import { ElementarOptions, CustomElement, ElementBuildData, ELEMENTAR_OPTIONS } from '../options';
@@ -23,7 +23,7 @@ export function buildElement(node: CheerioElement, options: ElementarOptions): I
             throw new Error(`Error on building element(${builder.name}): ${e.message}`);
         }
         if (data) {
-            return new TagElement(data.name, data);
+            return buildElementFromData(data);
         }
     }
 }

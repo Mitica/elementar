@@ -25,7 +25,7 @@ test('#build', t => {
     let element = builder.build(validData);
 
     t.is(!!element, true, 'built element');
-    t.is(element.props.id, 'sQvzXwk_nJ4', 'youtube id is correct');
+    t.is(element.props.vid, 'sQvzXwk_nJ4', 'youtube id is correct');
     t.is(element.props.width, '500', 'youtube width is correct');
     t.is(element.props.height, '300', 'youtube width is correct');
 

@@ -53,7 +53,7 @@ export class ElementsBuilder {
         }
 
         // ignore element
-        if (!element.isContent && this.options.ignoreElements.test(element.name)) {
+        if (!element.isContent && this.options.ignoreElements.indexOf(element.name) > -1) {
             if (!element.isLeaf) {
                 debug(`Add childs of a Ignored elemenet: ${element.name}`);
                 element.children.forEach(child => this.addElement(elements, child));
@@ -67,14 +67,14 @@ export class ElementsBuilder {
     }
 
     private isValidElement(element: IElement) {
-        return element.hasContent() || this.options.emptyElements.test(element.name);
+        return element.hasContent() || this.options.emptyElements.indexOf(element.name) > -1;
     }
 
     private isValidNode(node: CheerioElement) {
         if (node.type === 'text') {
             return true;
         }
-        if (node.type === 'tag' && !this.options.invalidElements.test(node.name)) {
+        if (node.type === 'tag' && this.options.invalidElements.indexOf(node.name) < 0) {
             return true;
         }
 
